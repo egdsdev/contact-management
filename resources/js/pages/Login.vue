@@ -1,37 +1,78 @@
 <template>
-    <div class="flex items-center justify-center min-h-screen bg-gray-100">
-        <div class="bg-white p-8 rounded shadow w-96">
-            <h1 class="text-2xl font-bold mb-4">Login</h1>
-            <form @submit.prevent="submit">
-                <input v-model="email" type="email" placeholder="Email" class="w-full mb-2 p-2 border rounded" />
-                <input v-model="password" type="password" placeholder="Senha" class="w-full mb-4 p-2 border rounded" />
-                <button type="submit" class="bg-blue-500 text-white w-full py-2 rounded">Login</button>
-            </form>
-            <p class="mt-4 text-center text-gray-600">
-                Não tem conta?
-                <router-link to="/register" class="text-blue-500 hover:underline">Registrar</router-link>
-            </p>
-        </div>
-    </div>
+  <div class="min-h-screen flex justify-center items-start bg-gray-50 pt-32">
+    <form
+      @submit.prevent="submitLogin"
+      class="bg-white p-8 shadow-lg rounded-xl w-full max-w-sm"
+    >
+      <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">
+        Login
+      </h1>
+
+      <div class="mb-4">
+        <label class="block mb-1 font-semibold text-gray-700">Email</label>
+        <input
+          v-model="form.email"
+          type="email"
+          placeholder="you@example.com"
+          class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label class="block mb-1 font-semibold text-gray-700">Password</label>
+        <input
+          v-model="form.password"
+          type="password"
+          placeholder="••••••••"
+          class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 transition"
+      >
+        Login
+      </button>
+
+      <p class="mt-4 text-center text-gray-600">
+        Don't have an account?
+        <router-link
+          to="/register"
+          class="text-purple-600 hover:text-purple-700 font-medium"
+        >
+          Register
+        </router-link>
+      </p>
+    </form>
+  </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import { useContactStore } from '../stores/contactStore';
-import { useRouter } from 'vue-router';
+<script>
+import { reactive } from "vue";
+import { useAuthStore } from "../stores/authStore";
+import { useRouter } from "vue-router";
 
-const store = useContactStore();
-const router = useRouter();
+export default {
+  setup() {
+    const authStore = useAuthStore();
+    const router = useRouter();
 
-const email = ref('');
-const password = ref('');
+    const form = reactive({
+      email: "",
+      password: "",
+    });
 
-async function submit() {
-    try {
-        await store.login({ email: email.value, password: password.value });
-        router.push('/');
-    } catch (err) {
-        alert('Erro ao logar');
-    }
-}
+    const submitLogin = async () => {
+      try {
+        await authStore.login(form.email, form.password);
+        router.push("/"); // redirect after login
+      } catch (err) {
+        alert("Invalid credentials!");
+      }
+    };
+
+    return { form, submitLogin };
+  },
+};
 </script>

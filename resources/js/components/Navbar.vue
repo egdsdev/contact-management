@@ -1,37 +1,50 @@
 <template>
-    <nav class="bg-gray-800 text-white p-4 flex justify-between items-center">
-        <div class="font-bold text-lg">
-            <router-link to="/">Contact Management</router-link>
-        </div>
+  <nav class="bg-white shadow px-6 py-4 flex justify-between items-center">
+    <div class="text-2xl font-bold text-gray-800">
+      Contact Manager
+    </div>
 
-        <div class="flex items-center space-x-4">
-            <router-link to="/" class="hover:underline">Home</router-link>
+    <div class="space-x-4">
+      <router-link
+        to="/"
+        class="text-gray-700 hover:text-gray-900 font-semibold"
+      >
+        Home
+      </router-link>
 
-            <template v-if="store.token">
-                <span class="mr-2">Bem-vindo!</span>
-                <button @click="logout" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded">
-                    Logout
-                </button>
-            </template>
+      <button
+        v-if="isLoggedIn"
+        @click="logout"
+        class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+      >
+        Logout
+      </button>
 
-            <template v-else>
-                <router-link to="/login" class="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded">
-                    Login
-                </router-link>
-            </template>
-        </div>
-    </nav>
+      <router-link
+        v-else
+        to="/login"
+        class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+      >
+        Login
+      </router-link>
+    </div>
+  </nav>
 </template>
 
-<script setup>
-import { useContactStore } from '../stores/contactStore';
-import { useRouter } from 'vue-router';
+<script>
+import { computed } from "vue";
+import { useAuthStore } from "../stores/authStore";
 
-const store = useContactStore();
-const router = useRouter();
+export default {
+  setup() {
+    const authStore = useAuthStore();
+    const isLoggedIn = computed(() => authStore.isLoggedIn);
 
-function logout() {
-    store.logout();
-    router.push('/login');
-}
+    const logout = async () => {
+      await authStore.logout();
+    };
+
+    return { isLoggedIn, logout };
+  },
+};
 </script>
