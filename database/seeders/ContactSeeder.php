@@ -15,7 +15,7 @@ class ContactSeeder extends Seeder
 
         $contacts = [];
 
-        for ($i = 0; $i < 100; $i++) {
+        for ($i = 0; $i < 1000; $i++) {
             $contacts[] = [
                 'name' => $faker->name,
                 'contact' => $faker->phoneNumber,
