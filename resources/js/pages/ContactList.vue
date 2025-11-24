@@ -24,7 +24,7 @@
           </thead>
           <tbody>
             <tr
-              v-for="contact in store.contacts"
+              v-for="contact in paginatedContacts"
               :key="contact.id"
               class="border-b hover:bg-gray-50 transition"
             >
@@ -39,7 +39,7 @@
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8-11-8z"/>
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                     <circle cx="12" cy="12" r="3"/>
                   </svg>
                 </router-link>
@@ -78,18 +78,45 @@
           </tbody>
         </table>
       </div>
+
+      <div v-if="totalPages > 1" class="flex justify-center items-center mt-4 space-x-2">
+        <button
+          v-for="page in totalPages"
+          :key="page"
+          @click="currentPage = page"
+          :class="[
+            'px-3 py-1 rounded border transition',
+            page === currentPage
+              ? 'bg-purple-600 text-white border-purple-600'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-purple-50'
+          ]"
+        >
+          {{ page }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue';
+import { onMounted, computed, ref } from 'vue';
 import { useContactStore } from '../stores/contactStore';
 import { useAuthStore } from '../stores/authStore';
 
 const store = useContactStore();
 const authStore = useAuthStore();
 const isLoggedIn = computed(() => authStore.isLoggedIn);
+
+const currentPage = ref(1);
+const perPage = 20;
+
+const paginatedContacts = computed(() => {
+  const start = (currentPage.value - 1) * perPage;
+  const end = start + perPage;
+  return store.contacts.slice(start, end);
+});
+
+const totalPages = computed(() => Math.ceil(store.contacts.length / perPage));
 
 onMounted(() => {
   store.fetchContacts();
